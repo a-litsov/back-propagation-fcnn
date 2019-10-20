@@ -67,11 +67,18 @@ public class Main {
             for (int i = 0; i < indexes.length / batchSize; i++) {
                 float[][] input = new float[batchSize][];
                 int[] labels = new int[batchSize];
-                for (int j = 0; j < batchSize; j++) {
-                    input[j] = mnistData.getTrainImages().get(indexes[i*batchSize + j]);
-                    labels[j] = mnistData.getTrainLabels()[indexes[i*batchSize + j]];
+
+                int startIndex = i*batchSize;
+                int endIndex = (i+1)*batchSize;
+                if (endIndex > indexes.length) {
+                    endIndex = indexes.length;
                 }
-                network.teach(input, batchSize, labels, learningRate);
+
+                for (int j = startIndex; j < endIndex; j++) {
+                    input[j-startIndex] = mnistData.getTrainImages().get(indexes[j]);
+                    labels[j-startIndex] = mnistData.getTrainLabels()[indexes[j]];
+                }
+                network.teach(input, endIndex-startIndex, labels, learningRate);
             }
         }
         logger.info("testing is started");
