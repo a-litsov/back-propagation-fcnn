@@ -33,7 +33,7 @@ public class NetworkTest {
 
     @Test
     public void testLowLearningRateLowHiddenLayerNeuronsCount() {
-        float accuracy = test(0.01f, 10, 20);
+        float accuracy = test(0.05f, 10, 20);
         Assert.assertTrue("Accuracy:" + accuracy,accuracy >= 92);
     }
 
