@@ -1,13 +1,11 @@
 package ru.unn.itmm.fcnn.util;
 
-import static java.lang.String.format;
-
-import java.io.ByteArrayOutputStream;
-import java.io.RandomAccessFile;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.String.format;
 
 public class MnistReader {
 	public static final int LABEL_FILE_MAGIC_NUMBER = 2049;
@@ -85,7 +83,7 @@ public class MnistReader {
 	 * them. ;-)
 	 ******/
 	private static String getFilePath(String fileName) {
-		return MnistReader.class.getClassLoader().getResource(fileName).getPath();
+	    return null;
 	}
 
 	public static ByteBuffer loadFileToByteBuffer(String infile) {
@@ -93,19 +91,10 @@ public class MnistReader {
 	}
 
 	public static byte[] loadFile(String fileName) {
-		try {
-			RandomAccessFile f = new RandomAccessFile(getFilePath(fileName), "r");
-			FileChannel chan = f.getChannel();
-			long fileSize = chan.size();
-			ByteBuffer bb = ByteBuffer.allocate((int) fileSize);
-			chan.read(bb);
-			bb.flip();
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			for (int i = 0; i < fileSize; i++)
-				baos.write(bb.get());
-			chan.close();
-			f.close();
-			return baos.toByteArray();
+		try (InputStream is = MnistReader.class.getClassLoader().getResource(fileName).openStream()){
+		    byte[] bytes = new byte[is.available()];
+		    is.read(bytes);
+		    return bytes;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
