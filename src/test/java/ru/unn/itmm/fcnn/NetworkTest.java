@@ -34,19 +34,19 @@ public class NetworkTest {
     @Test
     public void testLowLearningRateLowHiddenLayerNeuronsCount() {
         float accuracy = test(0.05f, 10, 20);
-        Assert.assertTrue("Accuracy:" + accuracy,accuracy >= 92);
+        Assert.assertTrue("Accuracy:" + accuracy,accuracy >= 90);
     }
 
     @Test
     public void testLowLearningRateModerateHiddenLayerNeuronsCount() {
         float accuracy = test(0.05f, 10, 50);
-        Assert.assertTrue("Accuracy:" + accuracy,accuracy >= 92);
+        Assert.assertTrue("Accuracy:" + accuracy,accuracy >= 90);
     }
 
     @Test
     public void testLowLearningRateBigHiddenLayerNeuronsCount() {
         float accuracy = test(0.05f, 10, 80);
-        Assert.assertTrue("Accuracy:" + accuracy, accuracy >= 92);
+        Assert.assertTrue("Accuracy:" + accuracy, accuracy >= 90);
     }
 
     private static final float test(float learningRate, int epochCount, int hiddenSize) {

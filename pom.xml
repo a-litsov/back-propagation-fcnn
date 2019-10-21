@@ -27,6 +27,11 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -53,10 +58,12 @@
                             <mainClass>ru.unn.itmm.fcnn.Main</mainClass>
                         </manifest>
                     </archive>
+                    <finalName>fcnn-a-litsov</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>assemble-all</id>
+                        <id>assembly-all</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>

@@ -1,5 +1,7 @@
 package ru.unn.itmm.fcnn.util;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -82,19 +84,13 @@ public class MnistReader {
 	 * Just very ugly utilities below here. Best not to subject yourself to
 	 * them. ;-)
 	 ******/
-	private static String getFilePath(String fileName) {
-	    return null;
-	}
-
 	public static ByteBuffer loadFileToByteBuffer(String infile) {
 		return ByteBuffer.wrap(loadFile(infile));
 	}
 
 	public static byte[] loadFile(String fileName) {
-		try (InputStream is = MnistReader.class.getClassLoader().getResource(fileName).openStream()){
-		    byte[] bytes = new byte[is.available()];
-		    is.read(bytes);
-		    return bytes;
+		try (InputStream is = MnistReader.class.getClassLoader().getResourceAsStream(fileName)){
+		    return IOUtils.toByteArray(is);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
