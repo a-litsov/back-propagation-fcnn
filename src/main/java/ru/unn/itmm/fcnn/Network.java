@@ -23,8 +23,6 @@ class Network {
     private float[][] hiddenDerivatives;
     private float[][] outputDerivatives;
 
-    private float outputMax;
-
     Network(int batchSize, int inputSize, int hiddenSize, int outputSize) {
         logger.info("Started network configuration with {} batch size, {} input neurons, {} hidden neurons and "
                 + "{} output neurons", batchSize, inputSize, hiddenSize, outputSize);
@@ -49,36 +47,39 @@ class Network {
         logger.info("Network configuration done, gradient matrices will be summed with {} coefficient", avg);
     }
 
-    private void singleForwardPass(float[] input, float[] hidden, float[] hiddenDerivatives, float[] output) {
+    /**
+     * @param current - position of current sample in batch array
+     */
+    private void singleForwardPass(int current) {
         logger.debug("singleForwardPass");
         for (int i = 0; i < hiddenSize; i++) {
-            hidden[i] = 0;
+            hidden[current][i] = 0;
             for (int j = 0; j < inputSize; j++) {
-                hidden[i] += hiddenWeights[i][j] * input[j];
+                hidden[current][i] += hiddenWeights[i][j] * input[current][j];
             }
-            hidden[i] += hiddenWeights[i][inputSize]; // adding threshold
+            hidden[current][i] += hiddenWeights[i][inputSize]; // adding threshold
 
             // end of hidden calculation
-            hidden[i] = (float) Math.tanh(hidden[i]);
-            hiddenDerivatives[i] = Utils.tanhDerivative(hidden[i]);
+            hidden[current][i] = (float) Math.tanh(hidden[current][i]);
+            hiddenDerivatives[current][i] = Utils.tanhDerivative(hidden[current][i]);
         }
 
-        outputMax = 0;
+        float outputMax = 0;
         for (int i = 0; i < outputSize; i++) {
-            output[i] = 0;
+            output[current][i] = 0;
             for (int j = 0; j < hiddenSize; j++) {
-                output[i] += outputWeights[i][j] * hidden[j];
+                output[current][i] += outputWeights[i][j] * hidden[current][j];
             }
-            output[i] += outputWeights[i][hiddenSize]; // adding threshold
+            output[current][i] += outputWeights[i][hiddenSize]; // adding threshold
 
-            if (outputMax < output[i]) {
-                outputMax = output[i];
+            if (outputMax < output[current][i]) {
+                outputMax = output[current][i];
             }
         }
         outputMax /= 2;
 
         for (int i = 0; i < outputSize; i++) {
-            output[i] = Utils.softMax(output, outputMax, i);
+            output[current][i] = Utils.softMax(output[current], outputMax, i);
         }
         logger.debug("singleForwardPass done");
     }
@@ -86,38 +87,38 @@ class Network {
     private void batchForwardPass(float[][] input, int realSize) {
         logger.debug("batchForwardPass");
         for (int i = 0; i < realSize; i++) {
-            singleForwardPass(input[i], hidden[i], hiddenDerivatives[i], output[i]);
+            singleForwardPass(i);
         }
         logger.debug("batchForwardPass ended");
     }
 
-    private void backwardPass(
-            int label, float[] input, float[] output, float[] hidden, float[] outputDerivatives,
-            float[] hiddenDerivatives, float learningRate
-    ) {
+    /**
+     * @param current - position of current sample in batch array
+     */
+    private void backwardPass(int current, int label, float learningRate) {
         logger.debug("started single backward pass");
         for (int i = 0; i < outputSize; i++) {
-            outputDerivatives[i] = (i == label) ? output[i] - 1.0f : output[i];
+            outputDerivatives[current][i] = (i == label) ? output[current][i] - 1.0f : output[current][i];
             for (int j = 0; j < hiddenSize; j++) {
-                outputWeights[i][j] -= outputDerivatives[i] * hidden[j] * learningRate * avg;
+                outputWeights[i][j] -= outputDerivatives[current][i] * hidden[current][j] * learningRate * avg;
             }
-            outputWeights[i][hiddenSize] -= outputDerivatives[i] * learningRate * avg;
+            outputWeights[i][hiddenSize] -= outputDerivatives[current][i] * learningRate * avg;
         }
 
 
         for (int i = 0; i < hiddenSize; i++) {
             float sum = 0;
             for (int j = 0; j < outputSize; j++) {
-                 sum += outputDerivatives[j] * outputWeights[j][i];
+                 sum += outputDerivatives[current][j] * outputWeights[j][i];
             }
-            hiddenDerivatives[i] *= sum;
+            hiddenDerivatives[current][i] *= sum;
         }
 
         for (int i = 0; i < hiddenSize; i++) {
             for (int j = 0; j < inputSize; j++) {
-                hiddenWeights[i][j] -= hiddenDerivatives[i] * input[j] * learningRate * avg;
+                hiddenWeights[i][j] -= hiddenDerivatives[current][i] * input[current][j] * learningRate * avg;
             }
-            hiddenWeights[i][inputSize] -= hiddenDerivatives[i] * learningRate * avg;
+            hiddenWeights[i][inputSize] -= hiddenDerivatives[current][i] * learningRate * avg;
         }
         logger.debug("single backward pass ended");
     }
@@ -132,7 +133,7 @@ class Network {
     private void batchBackwardPass(int[] labels, int realSize, float learningRate) {
         logger.debug("started batch backward pass");
         for (int i = 0; i < realSize; i++) {
-            backwardPass(labels[i], input[i], output[i], hidden[i], outputDerivatives[i], hiddenDerivatives[i], learningRate);
+            backwardPass(i, labels[i],  learningRate);
         }
         logger.debug("batch backward pass ended");
     }
@@ -151,9 +152,14 @@ class Network {
     }
 
     int test(float[] input) {
+        // we will use first batch element as testing input
+        int current = 0;
+        this.input[current] = input;
+
         logger.debug("started testing");
-        singleForwardPass(input, hidden[0], hiddenDerivatives[0], output[0]);
+        singleForwardPass(current);
+        int result = predict();
         logger.debug("testing ended");
-        return predict();
+        return result;
     }
 }
