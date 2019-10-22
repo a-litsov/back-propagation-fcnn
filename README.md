@@ -17,15 +17,15 @@ java -jar fcnn-a-litsov.jar [learning_rate] [epoch] [hidden layer size] [batch s
 All theory is located in `/theory` folder as images (ru).
 
 ## Results
-| Learning rate | Epochs | Hidden layer | Batch Size | Test Accuracy, (%)
-| ------------- | ------------- | ------------- | ------------- | ------------- |
-| 0.1  | 10  | 16 | 10 | 94.04 |
-| 0.05  | 10  | 16 | 10 | 94.17 |
-| 0.01  | 10  | 16 | 10 | 93.69 |
-| 0.05  | 10  | 80 | 10 | 97.21 |
-| 0.05  | 20  | 80 | 10 | **97.43** |
-| 0.05  | 20  | 80 | 100 | 96.27 |
-| 0.05  | 20  | 80 | 256 | 94.8 |
+| Learning rate | Epochs | Hidden layer | Batch Size | Train Accuracy, (%) | Test Accuracy, (%) |
+| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |
+| 0.1  | 10  | 16 | 10 | 95.25 | 94.04 |
+| 0.05  | 10  | 16 | 10 | 95.27 | 94.17 |
+| 0.01  | 10  | 16 | 10 | 94.34 | 93.69 |
+| 0.05  | 10  | 80 | 10 | 99.1 | 97.52 |
+| 0.05  | 20  | 80 | 10 | **99.81** | **97.57** |
+| 0.05  | 20  | 80 | 100 | 96.99 | 96.27 |
+| 0.05  | 20  | 80 | 256 | 94.92 | 94.8 |
 
 ## About
 Two-layer fully-connected neural network with tanh activation function used in the hidden layer and softmax activation

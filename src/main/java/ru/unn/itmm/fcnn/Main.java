@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import ru.unn.itmm.fcnn.util.MnistData;
 import ru.unn.itmm.fcnn.util.MnistReader;
 
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
@@ -49,19 +50,19 @@ public class Main {
                 "t10k-labels.idx1-ubyte"
         );
 
-        logger.info("train count: " + mnistData.getTrainImages().size());
-        logger.info("test count: " + mnistData.getTestImages().size());
-        logger.info("data is loaded");
+        logger.info("MNIST dataset is loaded");
+        logger.info("Training dataset size: {}", mnistData.getTrainImages().size());
+        logger.info("Test dataset size: {}", mnistData.getTestImages().size());
 
         //configuring network
         Network network = new Network(batchSize, IMAGE_SIZE, hiddenSize, OUTPUT_SIZE);
 
         //for shuffle procedure
         int[] indexes = IntStream.range(0, mnistData.getTrainLabels().length).toArray();
-        logger.info("start train");
+        logger.info("Training is started");
 
         for (int epoch = 0; epoch < epochCount; epoch++) {
-            logger.info("epoch: #" + epoch);
+            logger.info("Epoch: #{}...", epoch);
             shuffleArray(indexes);
 
             for (int i = 0; i < indexes.length / batchSize; i++) {
@@ -81,16 +82,22 @@ public class Main {
                 network.teach(input, endIndex-startIndex, labels, learningRate);
             }
         }
-        logger.info("testing is started");
+        logger.info("Training is ended");
+        logger.info("Train accuracy: {}", test(network, mnistData.getTrainImages(), mnistData.getTrainLabels()));
+
+        logger.info("Testing is started");
+        logger.info("Test accuracy: {}", test(network, mnistData.getTestImages(), mnistData.getTestLabels()));
+    }
+
+    private static float test(Network network, List<float[]> images, int[] labels) {
         int correctCount = 0;
         int actual, expected;
-        for (int i = 0; i < mnistData.getTestLabels().length; i++) {
-            actual = network.test(mnistData.getTestImages().get(i));
-            expected = mnistData.getTestLabels()[i];
+        for (int i = 0; i < labels.length; i++) {
+            actual = network.predict(images.get(i));
+            expected = labels[i];
             if (actual == expected)
                 correctCount++;
         }
-
-        System.out.println("---- Result accuracy: " + (float) correctCount / mnistData.getTestLabels().length * 100);
+        return (float) correctCount / labels.length * 100;
     }
 }

@@ -24,8 +24,8 @@ class Network {
     private float[][] outputDerivatives;
 
     Network(int batchSize, int inputSize, int hiddenSize, int outputSize) {
-        logger.info("Started network configuration with {} batch size, {} input neurons, {} hidden neurons and "
-                + "{} output neurons", batchSize, inputSize, hiddenSize, outputSize);
+        logger.info("Started network configuration with {} hidden neurons, {} batch size, {} input neurons, and "
+                + "{} output neurons", hiddenSize, batchSize, inputSize, outputSize);
         this.avg = (float) 1 / batchSize;
 
         this.inputSize = inputSize;
@@ -44,7 +44,7 @@ class Network {
         hiddenDerivatives = new float[batchSize][hiddenSize];
         outputDerivatives = new float[batchSize][outputSize];
 
-        logger.info("Network configuration done, gradient matrices will be summed with {} coefficient", avg);
+        logger.info("Network initial configuration is done");
     }
 
     /**
@@ -84,7 +84,7 @@ class Network {
         logger.debug("singleForwardPass done");
     }
 
-    private void batchForwardPass(float[][] input, int realSize) {
+    private void batchForwardPass(int realSize) {
         logger.debug("batchForwardPass");
         for (int i = 0; i < realSize; i++) {
             singleForwardPass(i);
@@ -126,7 +126,7 @@ class Network {
     void teach(float[][] input, int realSize, int[] labels, float learningRate) {
         this.input = input;
 
-        batchForwardPass(input, realSize);
+        batchForwardPass(realSize);
         batchBackwardPass(labels, realSize, learningRate);
     }
 
@@ -138,27 +138,32 @@ class Network {
         logger.debug("batch backward pass ended");
     }
 
-    int predict() {
-        logger.debug("started predicting");
-        float max = output[0][0];
+    /**
+     * @param position # of element in batch that is used to store test input
+     * @return most probable class determined by probabilities in output vector
+     */
+    private int mostProbableClass(int position) {
+        logger.debug("started most probable class identification");
+        float max = output[position][0];
         int value = 0;
-        for (int i = 0; i < outputSize; i++)
-            if (output[0][i] > max) {
-                max = output[0][i];
-                value = i;			//predicted class
+        for (int i = 0; i < outputSize; i++) {
+            if (output[position][i] > max) {
+                max = output[position][i];
+                value = i;            //predicted class
             }
-        logger.debug("predicting finished. predicted class {}, it's probability {}", value, max);
+        }
+        logger.debug("class {} is most probable, it's probability {}", value, max);
         return value;
     }
 
-    int test(float[] input) {
+    int predict(float[] input) {
         // we will use first batch element as testing input
         int current = 0;
         this.input[current] = input;
 
         logger.debug("started testing");
         singleForwardPass(current);
-        int result = predict();
+        int result = mostProbableClass(current);
         logger.debug("testing ended");
         return result;
     }

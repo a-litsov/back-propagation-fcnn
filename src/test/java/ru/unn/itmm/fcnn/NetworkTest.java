@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import ru.unn.itmm.fcnn.util.MnistData;
 import ru.unn.itmm.fcnn.util.MnistReader;
 
-import java.util.List;
 import java.util.stream.IntStream;
 
 import static ru.unn.itmm.fcnn.Main.shuffleArray;
@@ -79,7 +78,7 @@ public class NetworkTest {
         int correctCount = 0;
         int actual, expected;
         for (int i = 0; i < mnistData.getTestLabels().length; i++) {
-            actual = network.test(mnistData.getTestImages().get(i));
+            actual = network.predict(mnistData.getTestImages().get(i));
             expected = mnistData.getTestLabels()[i];
             if (actual == expected)
                 correctCount++;
