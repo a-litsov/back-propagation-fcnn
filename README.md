@@ -7,7 +7,7 @@ you already have it installed.
     1. Install [JDK 8+](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
     2. Install [Apache Maven 3+](http://maven.apache.org/download.cgi).
     3. In repository root run the following command `mvn clean install`.
-    4. Desired `fcnn-a-litsov.jar` file appeared in `/target` directory.
+    4. Take `fcnn-a-litsov.jar` file from `/target` directory.
 3. Run the program with the following command:
 ```bash
 java -jar fcnn-a-litsov.jar [learning_rate] [epoch] [hidden layer size] [batch size]
