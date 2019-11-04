@@ -4,8 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.unn.itmm.fcnn.util.Utils;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.IntStream;
+
 class Network {
     private static final Logger logger = LoggerFactory.getLogger(Network.class);
+
+    private static final int THREADS = 8;
+
+    private ExecutorService executorService = Executors.newFixedThreadPool(THREADS);
 
     private float avg;
 
@@ -86,9 +94,9 @@ class Network {
 
     private void batchForwardPass(int realSize) {
         logger.debug("batchForwardPass");
-        for (int i = 0; i < realSize; i++) {
-            singleForwardPass(i);
-        }
+        IntStream.range(0, realSize).parallel().forEach(
+                this::singleForwardPass
+        );
         logger.debug("batchForwardPass ended");
     }
 
