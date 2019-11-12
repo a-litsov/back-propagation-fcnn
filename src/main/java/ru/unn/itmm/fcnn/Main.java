@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.unn.itmm.fcnn.util.MnistData;
 import ru.unn.itmm.fcnn.util.MnistReader;
+import ru.unn.itmm.fcnn.util.Utils;
 
 import java.util.List;
 import java.util.Random;
@@ -14,21 +15,6 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
     private static final int IMAGE_SIZE = 28 * 28;
     private static final int OUTPUT_SIZE = 10;
-
-    // Implementing Fisher–Yates shuffle
-    static void shuffleArray(int[] ar)
-    {
-        // If running on Java 6 or older, use `new Random()` on RHS here
-        Random rnd = ThreadLocalRandom.current();
-        for (int i = ar.length - 1; i > 0; i--)
-        {
-            int index = rnd.nextInt(i + 1);
-            // Simple swap
-            int a = ar[index];
-            ar[index] = ar[i];
-            ar[i] = a;
-        }
-    }
 
     public static void main(String[] args) {
         if (args.length < 4) {
@@ -64,7 +50,7 @@ public class Main {
 
         for (int epoch = 0; epoch < epochCount; epoch++) {
             logger.info("Epoch: #{}...", epoch);
-            shuffleArray(indexes);
+            Utils.shuffleArray(indexes);
 
             for (int i = 0; i < indexes.length / batchSize; i++) {
                 float[][] input = new float[batchSize][];

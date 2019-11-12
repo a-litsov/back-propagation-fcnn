@@ -8,10 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.unn.itmm.fcnn.util.MnistData;
 import ru.unn.itmm.fcnn.util.MnistReader;
+import ru.unn.itmm.fcnn.util.Utils;
 
 import java.util.stream.IntStream;
-
-import static ru.unn.itmm.fcnn.Main.shuffleArray;
 
 @RunWith(JUnit4.class)
 public class NetworkTest {
@@ -62,7 +61,7 @@ public class NetworkTest {
 
         for (int epoch = 0; epoch < epochCount; epoch++) {
             logger.info("epoch: #" + epoch);
-            shuffleArray(indexes);
+            Utils.shuffleArray(indexes);
 
             for (int i = 0; i < indexes.length / batchSize; i++) {
                 float[][] input = new float[batchSize][];
