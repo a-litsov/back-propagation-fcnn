@@ -105,8 +105,9 @@ class Network {
      */
     private void backwardPass(int current, int label, float learningRate) {
         logger.debug("started single backward pass");
+        System.arraycopy(output[current], 0, outputDerivatives[current], 0, output[current].length);
+        outputDerivatives[current][label] -= 1;
         for (int i = 0; i < outputSize; i++) {
-            outputDerivatives[current][i] = (i == label) ? output[current][i] - 1.0f : output[current][i];
             for (int j = 0; j < hiddenSize; j++) {
                 outputWeights[i][j] -= outputDerivatives[current][i] * hidden[current][j] * learningRate * avg;
             }
@@ -120,9 +121,7 @@ class Network {
                  sum += outputDerivatives[current][j] * outputWeights[j][i];
             }
             hiddenDerivatives[current][i] *= sum;
-        }
 
-        for (int i = 0; i < hiddenSize; i++) {
             for (int j = 0; j < inputSize; j++) {
                 hiddenWeights[i][j] -= hiddenDerivatives[current][i] * input[current][j] * learningRate * avg;
             }

@@ -60,6 +60,7 @@ public class Main {
         //for shuffle procedure
         int[] indexes = IntStream.range(0, mnistData.getTrainLabels().length).toArray();
         logger.info("Training is started");
+        long startTime = System.nanoTime();
 
         for (int epoch = 0; epoch < epochCount; epoch++) {
             logger.info("Epoch: #{}...", epoch);
@@ -82,7 +83,11 @@ public class Main {
                 network.teach(input, endIndex-startIndex, labels, learningRate);
             }
         }
-        logger.info("Training is ended");
+        long endTime = System.nanoTime();
+        long secondsSpent = (endTime - startTime) / 1_000_000_000;
+
+        logger.info("Training is ended, time spent: {} sec.", secondsSpent);
+
         logger.info("Train accuracy: {}", test(network, mnistData.getTrainImages(), mnistData.getTrainLabels()));
 
         logger.info("Testing is started");
