@@ -26,6 +26,9 @@ All theory is located in `/theory` folder as images (ru).
 | 0.05  | 20  | 80 | 10 | **99.81** | **97.57** |
 | 0.05  | 20  | 80 | 100 | 96.99 | 96.27 |
 | 0.05  | 20  | 80 | 256 | 94.92 | 94.8 |
+| 0.1  | 20  | 300 | 32 | **99.92** | **98.05** |
+| 0.1  | 20  | 300 | 64 | **99.42** | **97.83** |
+
 
 ## About
 Two-layer fully-connected neural network with tanh activation function used in the hidden layer and softmax activation

@@ -82,27 +82,25 @@ public class Main {
                 }
                 network.teach(input, endIndex-startIndex, labels, learningRate);
             }
+            logger.info("Train accuracy: {}", test(network, mnistData.getTrainImages(), mnistData.getTrainLabels()));
         }
         long endTime = System.nanoTime();
         long secondsSpent = (endTime - startTime) / 1_000_000_000;
 
         logger.info("Training is ended, time spent: {} sec.", secondsSpent);
 
-        logger.info("Train accuracy: {}", test(network, mnistData.getTrainImages(), mnistData.getTrainLabels()));
-
         logger.info("Testing is started");
         logger.info("Test accuracy: {}", test(network, mnistData.getTestImages(), mnistData.getTestLabels()));
     }
 
     private static float test(Network network, List<float[]> images, int[] labels) {
-        int correctCount = 0;
-        int actual, expected;
-        for (int i = 0; i < labels.length; i++) {
-            actual = network.predict(images.get(i));
-            expected = labels[i];
-            if (actual == expected)
-                correctCount++;
-        }
+        int correctCount = IntStream.range(0, labels.length).map(i -> {
+            if (network.predict(images.get(i)) == labels[i]) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }).sum();
         return (float) correctCount / labels.length * 100;
     }
 }

@@ -114,8 +114,7 @@ class Network {
             outputWeights[i][hiddenSize] -= outputDerivatives[current][i] * learningRate * avg;
         }
 
-
-        for (int i = 0; i < hiddenSize; i++) {
+        IntStream.range(0, hiddenSize).parallel().forEach(i -> {
             float sum = 0;
             for (int j = 0; j < outputSize; j++) {
                  sum += outputDerivatives[current][j] * outputWeights[j][i];
@@ -126,7 +125,7 @@ class Network {
                 hiddenWeights[i][j] -= hiddenDerivatives[current][i] * input[current][j] * learningRate * avg;
             }
             hiddenWeights[i][inputSize] -= hiddenDerivatives[current][i] * learningRate * avg;
-        }
+        });
         logger.debug("single backward pass ended");
     }
 
@@ -166,10 +165,37 @@ class Network {
     int predict(float[] input) {
         // we will use first batch element as testing input
         int current = 0;
-        this.input[current] = input;
 
         logger.debug("started testing");
-        singleForwardPass(current);
+        IntStream.range(0, hiddenSize).parallel().forEach(i -> {
+            hidden[current][i] = 0;
+            for (int j = 0; j < inputSize; j++) {
+                hidden[current][i] += hiddenWeights[i][j] * input[j];
+            }
+            hidden[current][i] += hiddenWeights[i][inputSize]; // adding threshold
+
+            // end of hidden calculation
+            hidden[current][i] = (float) Math.tanh(hidden[current][i]);
+        });
+
+        float outputMax = 0;
+        for (int i = 0; i < outputSize; i++) {
+            output[current][i] = 0;
+            for (int j = 0; j < hiddenSize; j++) {
+                output[current][i] += outputWeights[i][j] * hidden[current][j];
+            }
+            output[current][i] += outputWeights[i][hiddenSize]; // adding threshold
+
+            if (outputMax < output[current][i]) {
+                outputMax = output[current][i];
+            }
+        }
+        outputMax /= 2;
+
+        for (int i = 0; i < outputSize; i++) {
+            output[current][i] = Utils.softMax(output[current], outputMax, i);
+        }
+
         int result = mostProbableClass(current);
         logger.debug("testing ended");
         return result;
